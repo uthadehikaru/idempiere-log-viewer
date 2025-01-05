@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+	   version="4.0">
+	<display-name>iDempiere Log Viewer</display-name>
+	<description></description>
+	<context-param>
+		<param-name>LogViewer</param-name>
+		<param-value>1</param-value>
+	</context-param>
+	<servlet>
+		<servlet-name>LogHandler</servlet-name>
+		<servlet-class>id.rekaestudigital.idempiere.logviewer.handler.LogHandler</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>LogHandler</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>DownloadHandler</servlet-name>
+		<servlet-class>id.rekaestudigital.idempiere.logviewer.handler.DownloadHandler</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DownloadHandler</servlet-name>
+		<url-pattern>/download/*</url-pattern>
+	</servlet-mapping>
+</web-app>

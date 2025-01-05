@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Log-viewer
+Bundle-SymbolicName: id.rekaestudigital.idempiere.log-viewer;singleton:=true
+Bundle-Vendor: Reka Estu Digital
+Bundle-Version: 1.0.0.qualifier
+Import-Package: javax.servlet;version="[4.0.0,5.0.0)",
+ javax.servlet.http;version="[4.0.0,5.0.0)",
+ org.apache.ecs,
+ org.apache.ecs.xhtml,
+ org.osgi.framework;version="1.10.0"
+Require-Bundle: org.adempiere.base;bundle-version="12.0.0",
+ org.adempiere.plugin.utils;bundle-version="12.0.0",
+ zk;bundle-version="10.0.1",
+ zul;bundle-version="10.0.1"
+Automatic-Module-Name: id.rekaestudigital.idempiere.log.viewer
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: id.rekaestudigital.idempiere.logviewer.Activator
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Web-ContextPath: /log-viewer
+Jetty-Environment: ee8
