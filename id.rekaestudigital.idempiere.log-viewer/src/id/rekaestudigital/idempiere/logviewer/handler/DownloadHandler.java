@@ -14,7 +14,7 @@ import org.compiere.util.Ini;
 public class DownloadHandler extends HttpServlet {
 
 	/**
-	 * 
+	 * @author ZuhriUtama
 	 */
 	private static final long serialVersionUID = 4830030672124779394L;
 

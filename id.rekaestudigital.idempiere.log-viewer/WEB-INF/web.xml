@@ -9,6 +9,15 @@
 		<param-name>LogViewer</param-name>
 		<param-value>1</param-value>
 	</context-param>
+	<filter>
+		<display-name>Log Viewer Filter</display-name>
+		<filter-name>LogViewerFilter</filter-name>
+		<filter-class>id.rekaestudigital.idempiere.logviewer.handler.LogFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>LogViewerFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 	<servlet>
 		<servlet-name>LogHandler</servlet-name>
 		<servlet-class>id.rekaestudigital.idempiere.logviewer.handler.LogHandler</servlet-class>
