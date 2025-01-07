@@ -62,6 +62,8 @@ public class LogHandler extends HttpServlet {
 	    String fileName = request.getParameter("file");
 	    if (fileName != null) {
 	        log = new File(path + File.separator + fileName);
+	    }else if(files.length>0){
+	    	log = files[0];
 	    }
 	
 	    html m_html = new html();
@@ -314,7 +316,9 @@ public class LogHandler extends HttpServlet {
 		div rightPanel = new div();
 	    rightPanel.setClass("w-full md:w-4/5 p-2");
 	    
-	    if(log.length()>limitSize) {
+	    if(log==null) {
+	    	rightPanel.addElement("<h1>Please select a log file</h1>");
+	    }else if(log.length()>limitSize) {
 	    	rightPanel.addElement("<h1>File Size more than "+ humanReadableByteCountSI(limitSize) +", please download the file to read the content");
 	    }else {
 	    	showLog = true;
@@ -376,7 +380,7 @@ public class LogHandler extends HttpServlet {
 		                    + "</tr>");
 		        }
 		    } catch (IOException e) {
-		        e.printStackTrace();
+		    	rightPanel.addElement("<h1>"+e.getLocalizedMessage()+"</h1>");
 		    }
 		
 		    rightPanel.addElement("</tbody>"
@@ -393,8 +397,6 @@ public class LogHandler extends HttpServlet {
 	    leftPanel.addElement("<div class=\"p-2\"><a href=\"/\" class=\"text-sm hover:underline\">back to IDempiere Home</a></div>");
 	
 	    for (File file : files) {
-	        if (log == null)
-	            log = file;
 	        leftPanel.addElement(createCard(file));
 	    }
         return leftPanel;
@@ -405,7 +407,7 @@ public class LogHandler extends HttpServlet {
 		long fileSizeInBytes = file.length();
         String size = humanReadableByteCountSI(fileSizeInBytes);
         div card = new div();
-        if (log.getName().equals(file.getName()))
+        if (log!=null && file.getName().equals(log.getName()))
             card.setClass("border rounded-md bg-success text-white mb-2 p-2 flex justify-between");
         else
             card.setClass("border rounded-md border-success hover:bg-success mb-2 hover:text-white p-2 flex justify-between");
