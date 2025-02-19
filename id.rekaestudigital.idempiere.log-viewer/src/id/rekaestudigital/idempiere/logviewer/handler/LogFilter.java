@@ -29,10 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.adempiere.base.sso.ISSOPrincipalService;
-import org.adempiere.base.sso.SSOUtils;
 import org.apache.commons.codec.binary.Base64;
-import org.compiere.model.MSysConfig;
 import org.compiere.model.MUser;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env; 
@@ -92,70 +89,29 @@ public class LogFilter implements Filter
 				request.getRequestDispatcher(errorPage).forward(request, response);
 				return;
 			}
-
-			boolean isSSOEnable = MSysConfig.getBooleanValue(MSysConfig.ENABLE_SSO_IDEMPIERE_MONITOR, false);
 			HttpServletRequest req = (HttpServletRequest)request;
 			HttpServletResponse resp = (HttpServletResponse)response;
-			boolean isRedirectToLoginOnError = false;
-			ISSOPrincipalService m_SSOPrincipal = null;
-			if (isSSOEnable) {
-				try {
-
-					m_SSOPrincipal = SSOUtils.getSSOPrincipalService();
-
-					if (m_SSOPrincipal != null) {
-						if (m_SSOPrincipal.hasAuthenticationCode(req, resp)) {
-							// Use authentication code get get token
-							String currentUri = req.getRequestURL().toString();
-							m_SSOPrincipal.getAuthenticationToken(req, resp, SSOUtils.SSO_MODE_MONITOR);
-							if (!resp.isCommitted())
-								resp.sendRedirect(currentUri);
-						} else if (!m_SSOPrincipal.isAuthenticated(req, resp)) {
-							// Redirect to SSO sing in page for authentication
-							m_SSOPrincipal.redirectForAuthentication(req, resp, SSOUtils.SSO_MODE_MONITOR);
-							return;
-						}
-						// validate the user
-						if (checkSSOAuthorization(m_SSOPrincipal, req.getSession().getAttribute(ISSOPrincipalService.SSO_PRINCIPAL_SESSION_TOKEN)))
-						{
-							chain.doFilter(request, response);
-							return;
-						}
-					}
-					req.getSession().removeAttribute(ISSOPrincipalService.SSO_PRINCIPAL_SESSION_TOKEN);
-				} catch (Throwable exc) {
-					log.log(Level.SEVERE, "Exception while authenticating: ", exc);
-					if (m_SSOPrincipal != null)
-						m_SSOPrincipal.removePrincipalFromSession(req);
-					if (isRedirectToLoginOnError) {
-						resp.sendRedirect("idempiereMonitor");
-					} else {
-						resp.setStatus(500);
-						response.setContentType("text/html");
-						response.getWriter().append(SSOUtils.getCreateErrorResponce(exc.getLocalizedMessage()));
-					}
-					return;
-				}
-			}
-
-			if (m_SSOPrincipal == null || !isSSOEnable)
+			//	Previously checked
+			HttpSession session = req.getSession(true);
+			Long compare = (Long)session.getAttribute(AUTHORIZATION);
+			if (compare != null && compare.compareTo(m_authorization) == 0)
 			{
-				HttpSession session = req.getSession(true);
-				// Previously checked
-				Long compare = (Long) session.getAttribute(AUTHORIZATION);
-				if (compare != null && compare.compareTo(m_authorization) == 0) {
-					pass = true;
-				} else if (checkAuthorization(req.getHeader("Authorization"))) {
-					session.setAttribute(AUTHORIZATION, m_authorization);
-					pass = true;
-				}
-				// --------------------------------------------
-				if (pass) {
-					chain.doFilter(request, response);
-				} else {
-					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-					resp.setHeader("WWW-Authenticate", "BASIC realm=\"Adempiere Server\"");
-				}
+				pass = true;
+			}
+			else if (checkAuthorization (req.getHeader("Authorization")))
+			{
+				session.setAttribute(AUTHORIZATION, m_authorization);
+				pass = true;
+			}
+			//	--------------------------------------------
+			if (pass)
+			{
+				chain.doFilter(request, response);
+			}
+			else
+			{
+				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				resp.setHeader("WWW-Authenticate", "BASIC realm=\"Adempiere Server\"");
 			}
 			return;
 		}
@@ -166,27 +122,6 @@ public class LogFilter implements Filter
 		request.getRequestDispatcher(errorPage).forward(request, response);
 	}	//	doFilter
 
-	private boolean checkSSOAuthorization(ISSOPrincipalService principalService, Object token)
-	{
-		if (token == null)
-			return false;
-		try
-		{
-			String username = principalService.getUserName(token);
-			return validateUser(username, null, true);
-		}
-		catch (Exception e)
-		{
-			log.log(Level.SEVERE, "check", e);
-		}
-		return false;
-	}
-
-	/**
-	 * 	Check Authorization
-	 *	@param authorization authorization
-	 *	@return true if authenticated
-	 */
 	private boolean checkAuthorization (String authorization)
 	{
 		if (authorization == null)
@@ -200,7 +135,19 @@ public class LogFilter implements Filter
 			int index = namePassword.indexOf(':');
 			String name = namePassword.substring(0, index);
 			String password = namePassword.substring(index+1);
-			return validateUser(name, password, false);
+			MUser user = MUser.get(Env.getCtx(), name, password);
+			if (user == null)
+			{
+				log.warning ("User not found: '" + name);
+				return false;
+			}
+			if (!user.isAdministrator() && !user.hasURLFormAccess("/idempiereMonitor"))
+			{
+				log.warning ("User doesn't have access to /idempiereMonitor = " + name);
+				return false;
+			}
+			if (log.isLoggable(Level.INFO)) log.info ("Name=" + name);
+			return true;
 		}
 		catch (Exception e)
 		{
@@ -208,23 +155,6 @@ public class LogFilter implements Filter
 		}
 		return false;
 	}	//	check
-
-	private boolean validateUser(String name, String password, boolean isSSO)
-	{
-		MUser user = MUser.get(Env.getCtx(), name, password, isSSO);
-		if (user == null)
-		{
-			log.warning ("User not found: '" + name);
-			return false;
-		}
-		if (!user.isAdministrator() && !user.hasURLFormAccess("/idempiereMonitor"))
-		{
-			log.warning ("User doesn't have access to log viewer = " + name);
-			return false;
-		}
-		if (log.isLoggable(Level.INFO)) log.info ("Name=" + name);
-		return true;
-	}
 	
 	/**
 	 * 	Destroy
