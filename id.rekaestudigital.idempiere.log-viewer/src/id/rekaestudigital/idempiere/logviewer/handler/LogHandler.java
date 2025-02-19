@@ -343,6 +343,7 @@ public class LogHandler extends HttpServlet {
 		            + "</thead>"
 		            + "<tbody>");
 		
+		    boolean isAuthLog = log.getName().startsWith("AuthFailure");
 		    try (BufferedReader br = new BufferedReader(new FileReader(log))) {
 		        String line;
 		        int index = 0;
@@ -355,17 +356,22 @@ public class LogHandler extends HttpServlet {
 		                continue;
 		            }
 		            String checkTime = "";
-		            if (line.length() > 12) {
+		            if (line.length() > 12 && isAuthLog) {
+		            	checkTime = line.substring(0, 21);
+		            }else if(line.length() > 12) {
 		                checkTime = line.substring(0, 12);
 		            }
-		            if (isTimeFormat(checkTime)) {
+		            if (isTimeFormat(checkTime) || isAuthLog) {
 		                if (message.length() > 0) {
 		                	String msg = message.toString().replace("----------> ", "");
 		                    logEntries.add(lastTime + " " + msg);
 		                }
 		                lastTime = checkTime;
 		                message.setLength(0);
-		                message.append(line.substring(13));
+		                if(isAuthLog)
+			                message.append(line.substring(21));
+		                else
+		                	message.append(line.substring(13));
 		            } else {
 		                message.append(" ").append(line);
 		            }
@@ -379,8 +385,14 @@ public class LogHandler extends HttpServlet {
 		        logEntries.sort((e1, e2) -> e2.substring(0, 12).compareTo(e1.substring(0, 12)));
 	
 		        for (String entry : logEntries) {
-		            String time = entry.substring(0, 12);
-		            String msg = entry.substring(13);
+		        	String time, msg = "";
+		        	if(isAuthLog) {
+			            time = entry.substring(1, 20);
+			            msg = entry.substring(22);
+		        	}else {
+			            time = entry.substring(0, 12);
+			            msg = entry.substring(13);
+		        	}
 		            rightPanel.addElement("<tr>"
 		                    + "<td class=\"flex alignt-top\">" + time + "</td>"
 		                    + "<td>" + msg + "</td>"
