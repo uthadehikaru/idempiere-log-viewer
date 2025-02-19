@@ -3,6 +3,7 @@ package id.rekaestudigital.idempiere.logviewer.handler;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -53,7 +54,11 @@ public class LogHandler extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	        throws ServletException, IOException {
 	    File dir = new File(path);
-	    files = dir.listFiles();
+	    files = dir.listFiles(new FilenameFilter() {
+	        public boolean accept(File dir, String name) {
+	            return name.toLowerCase().endsWith(".log");
+	        }
+	    });
 	    Arrays.sort(files, (f1, f2) -> f2.getName().compareTo(f1.getName()));
 		
 	    response.setHeader("Cache-Control", "no-cache");
@@ -355,7 +360,8 @@ public class LogHandler extends HttpServlet {
 		            }
 		            if (isTimeFormat(checkTime)) {
 		                if (message.length() > 0) {
-		                    logEntries.add(lastTime + " " + message.toString());
+		                	String msg = message.toString().replace("----------> ", "");
+		                    logEntries.add(lastTime + " " + msg);
 		                }
 		                lastTime = checkTime;
 		                message.setLength(0);
@@ -366,7 +372,8 @@ public class LogHandler extends HttpServlet {
 		            index++;
 		        }
 		        if (message.length() > 0) {
-		            logEntries.add(lastTime + " " + message.toString());
+                	String msg = message.toString().replace("----------> ", "");
+                    logEntries.add(lastTime + " " + msg);
 		        }
 	
 		        logEntries.sort((e1, e2) -> e2.substring(0, 12).compareTo(e1.substring(0, 12)));
