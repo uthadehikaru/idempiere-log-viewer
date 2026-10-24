@@ -9,6 +9,17 @@
     <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <!-- Parent target uses ${project_loc:...}, which only resolves inside the iDempiere reactor. -->
+          <target combine.self="override">
+            <file>${project.basedir}/idempiere-13.target</file>
+          </target>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
@@ -21,6 +32,6 @@
   	<groupId>org.idempiere</groupId>
   	<artifactId>org.idempiere.parent</artifactId>
   	<version>${revision}</version>
-  	<relativePath>../../../idempiere/idempiere12/org.idempiere.parent/pom.xml</relativePath>
+  	<relativePath>../../idempiere13/org.idempiere.parent/pom.xml</relativePath>
   </parent>
 </project>
