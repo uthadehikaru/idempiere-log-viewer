@@ -1,10 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>id.rekaestudigital</groupId>
+    <artifactId>idempiere-log-viewer-parent</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
   <artifactId>id.rekaestudigital.idempiere.log-viewer</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
   <name>IDempiere Log Viewer</name>
   <description>IDempiere Log Viewer Plugin</description>
-   <packaging>eclipse-plugin</packaging>
+  <packaging>eclipse-plugin</packaging>
+  <properties>
+    <!-- Parent runs clean on every build by default; keep the Tycho target file. -->
+    <skipClean>true</skipClean>
+  </properties>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
@@ -15,7 +24,7 @@
         <configuration>
           <!-- Parent target uses ${project_loc:...}, which only resolves inside the iDempiere reactor. -->
           <target combine.self="override">
-            <file>${project.basedir}/idempiere-13.target</file>
+            <file>${idempiere.tycho.target}</file>
           </target>
         </configuration>
       </plugin>
@@ -23,15 +32,23 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <release>11</release>
+          <release>17</release>
         </configuration>
       </plugin>
     </plugins>
   </build>
-  <parent>
-  	<groupId>org.idempiere</groupId>
-  	<artifactId>org.idempiere.parent</artifactId>
-  	<version>${revision}</version>
-  	<relativePath>../../idempiere13/org.idempiere.parent/pom.xml</relativePath>
-  </parent>
+
+  <profiles>
+    <profile>
+      <id>build-from-plugin-directory</id>
+      <activation>
+        <file>
+          <missing>${maven.multiModuleProjectDirectory}/id.rekaestudigital.idempiere.log-viewer/pom.xml</missing>
+        </file>
+      </activation>
+      <properties>
+        <idempiere.tycho.target>${project.basedir}/idempiere-13.target</idempiere.tycho.target>
+      </properties>
+    </profile>
+  </profiles>
 </project>

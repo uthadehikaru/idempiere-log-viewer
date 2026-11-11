@@ -11,6 +11,29 @@ iDempiere Log Viewer is a tool designed to help you easily view and analyze logs
 - **Rotate logs**: Create new log file for easy monitoring.
 - **Configurable** : Change file size limit for large file log to prevent load the content.
 
+## Building
+
+Prerequisites:
+
+- JDK 17
+- Maven 3.6+
+- An iDempiere source tree built at least once (`mvn verify` in that checkout), as a **sibling** of this repository, default path `../idempiere`
+
+From the repository root:
+
+```bash
+mvn verify
+```
+
+Output JAR:
+
+`id.rekaestudigital.idempiere.log-viewer/target/id.rekaestudigital.idempiere.log-viewer-1.0.1-SNAPSHOT.jar`
+
+If your iDempiere checkout is not at `../idempiere` (sibling of this repo), edit:
+
+- `id.rekaestudigital.idempiere.log-viewer/idempiere-13-maven.target` for Maven
+- `id.rekaestudigital.idempiere.log-viewer/idempiere-13.target` for Eclipse PDE
+
 ## Installation
 
 To install the iDempiere Log Viewer, follow these steps:

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.idempiere</groupId>
+    <artifactId>org.idempiere.parent</artifactId>
+    <version>${revision}</version>
+    <relativePath>../idempiere/org.idempiere.parent/pom.xml</relativePath>
+  </parent>
+
+  <groupId>id.rekaestudigital</groupId>
+  <artifactId>idempiere-log-viewer-parent</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>iDempiere Log Viewer (reactor)</name>
+
+  <modules>
+    <module>id.rekaestudigital.idempiere.log-viewer</module>
+  </modules>
+
+  <properties>
+    <idempiere.tycho.target.reactor>${maven.multiModuleProjectDirectory}/id.rekaestudigital.idempiere.log-viewer/idempiere-13-maven.target</idempiere.tycho.target.reactor>
+    <idempiere.tycho.target>${idempiere.tycho.target.reactor}</idempiere.tycho.target>
+  </properties>
+
+</project>
