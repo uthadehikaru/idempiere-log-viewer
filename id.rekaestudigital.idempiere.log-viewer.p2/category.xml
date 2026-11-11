@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <bundle id="id.rekaestudigital.idempiere.log-viewer" version="0.0.0">
+      <category name="idempiere-log-viewer"/>
+   </bundle>
+   <category-def name="idempiere-log-viewer" label="iDempiere Log Viewer"/>
+</site>

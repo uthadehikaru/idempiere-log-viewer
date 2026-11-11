@@ -19,6 +19,7 @@
 
   <modules>
     <module>id.rekaestudigital.idempiere.log-viewer</module>
+    <module>id.rekaestudigital.idempiere.log-viewer.p2</module>
   </modules>
 
   <properties>
